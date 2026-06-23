@@ -274,9 +274,24 @@
       now.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'});
 
     let greet = 'Good evening';
-    if(h < 12) greet = 'Good morning';
-    else if(h < 17) greet = 'Good afternoon';
-    document.getElementById('greetingText').textContent = greet + ' , Sowmya 👋';
+if (h < 12) greet = 'Good morning';
+else if (h < 17) greet = 'Good afternoon';
+
+let userName = localStorage.getItem('flowspaceUserName');
+
+if (!userName) {
+  userName = prompt("What's your name?");
+
+  if (userName && userName.trim()) {
+    userName = userName.trim();
+    localStorage.setItem('flowspaceUserName', userName);
+  } else {
+    userName = 'Friend';
+  }
+}
+
+document.getElementById('greetingText').textContent =
+  `${greet}, ${userName} 👋`;
   }
   updateClock();
   setInterval(updateClock, 15000);
@@ -3137,4 +3152,20 @@ if ("serviceWorker" in navigator) {
       console.error("SW Error:", err);
     }
   });
+}
+function changeUserName() {
+
+    const newName = prompt("Enter your name:");
+
+    if(newName && newName.trim()){
+
+        localStorage.setItem(
+            "flowspaceUserName",
+            newName.trim()
+        );
+
+        updateClock();
+
+        showToast("Name updated successfully!", "✨");
+    }
 }
