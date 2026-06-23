@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowspace — Personal Productivity System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#D9B8A8">
+</head>
+<body data-theme="light">
+
+  <div class="bg-blob blob1"></div>
+  <div class="bg-blob blob2"></div>
+  <div class="bg-blob blob3"></div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="notification-banner" id="futureNoteBanner" style="display:none;">
+    <div class="banner-content">
+      <span class="banner-icon">🔮</span>
+      <span class="banner-text" id="futureNoteBannerText">Future Me Note: ...</span>
+    </div>
+    <button class="banner-close" id="futureNoteBannerClose">×</button>
+  </div>
+
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div>
+          <div class="brand-text">Flowspace</div>
+          <div class="brand-sub">Productivity Hub</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-section="overview"><span class="nav-icon">🏠</span> Overview</div>
+        <div class="nav-item" data-section="calendar"><span class="nav-icon">📅</span> Calendar</div>
+        <div class="nav-item" data-section="todo"><span class="nav-icon">✅</span> Planner & Tasks</div>
+        <div class="nav-item" data-section="timetable"><span class="nav-icon">🗓️</span> Time Blocking</div>
+        <div class="nav-item" data-section="habits"><span class="nav-icon">🔥</span> Habit Tracker</div>
+        <div class="nav-item" data-section="pomodoro"><span class="nav-icon">⏱️</span> Pomodoro</div>
+        <div class="nav-item" data-section="goals"><span class="nav-icon">🎯</span> Weekly Goals</div>
+        <div class="nav-item" data-section="journal"><span class="nav-icon">📝</span> Daily Journal</div>
+        <div class="nav-item" data-section="mood"><span class="nav-icon">😊</span> Mood Tracker</div>
+        <div class="nav-item" data-section="learning"><span class="nav-icon">📚</span> Learning Log</div>
+        <div class="nav-item" data-section="future"><span class="nav-icon">🔮</span> Future Me Notes</div>
+        <div class="nav-item" data-section="analytics"><span class="nav-icon">📊</span> Analytics</div>
+        <div class="nav-item" data-section="ai-planner"><span class="nav-icon">🤖</span> AI Planner</div>
+        <div class="nav-item" data-section="backup"><span class="nav-icon">💾</span> Backup & Export</div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-sm btn-block" id="globalSearchBtn">🔍 Global Search (/)</button>
+        <div class="notif-status" id="notifStatus">
+          <span class="notif-dot" id="notifDot"></span>
+          <span id="notifStatusText">Notifications: checking…</span>
+        </div>
+        <div class="theme-toggle" id="themeToggle">
+          <span id="themeLabel">☀️ Light Mode</span>
+          <div class="switch"><div class="switch-knob"></div></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main" id="mainContent">
+
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="menu-toggle" id="menuToggle">☰</div>
+          <div class="greeting">
+            <h1 id="greetingText">Welcome back Sowmya👋</h1>
+            <p>Here's what's happening with your productivity today.</p>
+          </div>
+        </div>
+        <div class="datetime-card">
+          <div class="time" id="liveTime">--:--</div>
+          <div class="date" id="liveDate">Loading...</div>
+        </div>
+      </div>
+
+      <div class="quote-banner">
+        <div class="quote-icon">💡</div>
+        <div class="quote-content-wrapper">
+          <div class="quote-text" id="quoteText">Loading quote...</div>
+          <div class="quote-author" id="quoteAuthor"></div>
+        </div>
+        <div class="banner-wave-deco" aria-hidden="true">
+          <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+            <path d="M0,80 C150,130 350,30 500,80 L500,150 L0,150 Z" style="stroke:none;fill:var(--sage-green);opacity:0.15;"></path>
+            <path d="M0,100 C180,150 310,50 500,100 L500,150 L0,150 Z" style="stroke:none;fill:var(--warm-peach);opacity:0.25;"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- SECTION: OVERVIEW -->
+<section class="section active" id="overview">
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-actions">
+
+    <button class="quick-action-btn" data-section="todo">
+      ➕ New Task 
+    </button>
+
+    <button class="quick-action-btn" data-section="habits">
+      🔥 Habit
+    </button>
+
+    <button class="quick-action-btn" data-section="journal">
+      📝 Journal
+    </button>
+
+    <button class="quick-action-btn" data-section="pomodoro">
+      ⏱ Focus
+    </button>
+
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+
+    <div class="stat-card stat-green">
+      <div class="stat-card-header">
+        <span>Tasks Done</span>
+        <span class="stat-emoji">✅</span>
+      </div>
+
+      <div class="stat-value" id="statTasksCompleted">
+        0
+      </div>
+
+      <div class="stat-label">
+        Planner completions
+      </div>
+    </div>
+
+    <div class="stat-card stat-orange">
+      <div class="stat-card-header">
+        <span>Pending</span>
+        <span class="stat-emoji">📌</span>
+      </div>
+
+      <div class="stat-value" id="statTasksPending">
+        0
+      </div>
+
+      <div class="stat-label">
+        Tasks remaining
+      </div>
+    </div>
+
+    <div class="stat-card stat-pink">
+      <div class="stat-card-header">
+        <span>Habit Rate</span>
+        <span class="stat-emoji">🔥</span>
+      </div>
+
+      <div class="stat-value" id="statHabitRate">
+        0%
+      </div>
+
+      <div class="stat-label">
+        Checked-in habits
+      </div>
+    </div>
+
+    <div class="stat-card stat-mint">
+      <div class="stat-card-header">
+        <span>Focus Log</span>
+        <span class="stat-emoji">⏱️</span>
+      </div>
+
+      <div class="stat-value" id="statFocusHours">
+        0m
+      </div>
+
+      <div class="stat-label">
+        Focused today
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="dashboard-grid">
+
+    <!-- LEFT -->
+    <div class="col">
+
+      <div class="glass-card">
+
+        <div class="card-header">
+          <div class="card-title">
+            🏠 Dashboard Widgets
+          </div>
+        </div>
+
+        <div class="widgets-subgrid">
+
+          <div class="widget-box">
+            <h4>Tasks Due Today</h4>
+            <div id="widgetTasksTodayList"></div>
+          </div>
+
+          <div class="widget-box">
+            <h4>Habit Streaks</h4>
+            <div id="widgetHabitStreaksList"></div>
+          </div>
+
+          <div class="widget-box">
+            <h4>Weekly Goals</h4>
+            <div id="widgetGoalProgressList"></div>
+          </div>
+
+          <div class="widget-box">
+            <h4>Future Notes</h4>
+            <div id="widgetFutureNotesList"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="glass-card">
+
+        <div class="card-header">
+          <div class="card-title">
+            🗓️ Today's Schedule
+          </div>
+        </div>
+
+        <div class="timetable-list" id="overviewTimetable"></div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col">
+
+      <div class="glass-card">
+
+        <div class="card-header">
+          <div class="card-title">
+            🎯 Daily Progress
+          </div>
+        </div>
+
+        <div class="progress-ring-wrap">
+
+          <div class="ring-box">
+
+            <svg width="140" height="140" viewBox="0 0 140 140">
+
+              <circle
+                class="ring-bg"
+                cx="70"
+                cy="70"
+                r="58">
+              </circle>
+
+              <circle
+                class="ring-fg"
+                id="mainRing"
+                cx="70"
+                cy="70"
+                r="58">
+              </circle>
+
+            </svg>
+
+            <div class="ring-center">
+
+              <div
+                class="num"
+                id="mainRingNum">
+                0%
+              </div>
+
+              <div class="lbl">
+                Productivity
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="mini-stats">
+
+            <div class="mini-stat-row">
+              <span class="dot"></span>
+              Tasks
+              <span
+                class="val"
+                id="miniTasksDone">
+                0/0
+              </span>
+            </div>
+
+            <div class="mini-stat-row">
+              <span class="dot"></span>
+              Habits
+              <span
+                class="val"
+                id="miniHabitsDone">
+                0/0
+              </span>
+            </div>
+
+            <div class="mini-stat-row">
+              <span class="dot"></span>
+              Best Streak
+              <span
+                class="val"
+                id="miniBestStreak">
+                0
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="glass-card">
+        <div class="card-title">😊 Today's Mood</div>
+        <div id="widgetMoodDisplay"></div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-title">📝 Journal Reflection</div>
+        <div id="widgetJournalDisplay"></div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-title">📚 Learning Summary</div>
+        <div id="widgetLearningDisplay"></div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-title">🏆 Achievements</div>
+        <div class="badges-row" id="overviewBadges"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+      <!-- SECTION: CALENDAR -->
+      <section class="section" id="calendar">
+        <div class="calendar-wrapper">
+          <div class="glass-card calendar-main-card">
+            <div class="card-header">
+              <div class="card-title"><span class="icon">📅</span> Interactive Calendar</div>
+              <div class="calendar-navigation">
+                <button class="btn btn-ghost btn-sm" id="calPrevMonth">◀ Prev</button>
+                <span class="calendar-month-year" id="calMonthYearLabel">June 2026</span>
+                <button class="btn btn-ghost btn-sm" id="calNextMonth">Next ▶</button>
+              </div>
+            </div>
+            <div class="calendar-grid-header">
+              <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+          </div>
+
+          <div class="glass-card day-details-card" id="calendarDetailsPanel">
+            <div class="card-header">
+              <div class="card-title"><span class="icon">🔍</span> Date: <span id="calDetailsDateLabel">Select a day</span></div>
+            </div>
+            <div id="calDetailsContent" class="cal-details-body">
+              <p class="text-muted">Click on a date to view details or add tasks.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: PLANNER -->
+      <section class="section" id="todo">
+        <div class="glass-card planner-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">✅</span> Daily Planner & Task Tracker</div>
+            <div class="planner-stats-bar">
+              Progress: <strong id="plannerProgressPercent">0%</strong> (<span id="plannerProgressCounts">0/0 completed</span>)
+            </div>
+          </div>
+          <form class="planner-form" id="todoForm">
+            <div class="form-row-main">
+              <input type="text" id="todoInput" placeholder="What needs to be done?" required>
+            </div>
+            <div class="form-row-secondary">
+              <textarea id="todoDescInput" placeholder="Task Description (optional)"></textarea>
+              <div class="form-group-inputs">
+                <label>Priority:
+                  <select id="todoPriorityInput">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </label>
+                <label>Est. Time (min):
+                  <input type="number" id="todoEstTimeInput" placeholder="30" min="0" value="30">
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary">＋ Add Task</button>
+            </div>
+          </form>
+          <div class="filter-tabs">
+            <div class="filter-tab active" data-filter="all">All</div>
+            <div class="filter-tab" data-filter="pending">Pending</div>
+            <div class="filter-tab" data-filter="completed">Completed</div>
+          </div>
+          <div class="todo-list-headers">
+            <div>Task</div>
+            <div>Priority</div>
+            <div>Est. Time</div>
+            <div>Actions</div>
+          </div>
+          <div class="todo-list" id="todoList"></div>
+        </div>
+      </section>
+
+      <!-- SECTION: TIME BLOCKING -->
+      <section class="section" id="timetable">
+        <div class="glass-card time-blocking-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">🗓️</span> Daily Time Blocking Schedule</div>
+            <span class="warning-text" id="timetableConflictWarning" style="display:none;">⚠️ Conflict Detected!</span>
+          </div>
+          <form class="inline-form" id="timetableForm">
+            <input type="text" id="ttName" placeholder="Task or Activity Title" required>
+            <input type="time" id="ttStart" required>
+            <input type="time" id="ttEnd" required>
+            <button type="submit" class="btn btn-primary">＋ Schedule Block</button>
+          </form>
+          <div class="timetable-list" id="timetableList"></div>
+        </div>
+      </section>
+
+      <!-- SECTION: HABITS -->
+      <section class="section" id="habits">
+        <div class="glass-card habits-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">🔥</span> Recurring Habit Tracker</div>
+          </div>
+          <form class="inline-form habit-form-grid" id="habitForm">
+            <input type="text" id="habitName" placeholder="Habit name (e.g. Exercise)" required>
+            <input type="text" id="habitIcon" placeholder="🔥" value="🔥" style="max-width:70px;text-align:center;">
+            <select id="habitFrequency">
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+            </select>
+            <input type="number" id="habitTarget" placeholder="Target" min="1" value="1" style="max-width:80px;">
+            <button type="submit" class="btn btn-primary">＋ Add Habit</button>
+          </form>
+          <div class="habit-list" id="habitList"></div>
+        </div>
+      </section>
+
+      <!-- SECTION: POMODORO -->
+      <section class="section" id="pomodoro">
+        <div class="glass-card pomodoro-card-panel">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">⏱️</span> Pomodoro Productivity Timer</div>
+            <button class="notif-permission-btn" id="enableNotifBtn" style="display:none;">Enable notifications</button>
+          </div>
+          <div class="pomodoro-wrap">
+            <div class="pomodoro-modes">
+              <button class="btn btn-ghost active" id="pomoModeFocus">Focus (25m)</button>
+              <button class="btn btn-ghost" id="pomoModeShort">Short Break (5m)</button>
+              <button class="btn btn-ghost" id="pomoModeLong">Long Break (15m)</button>
+            </div>
+            <div class="pomodoro-ring-centerpiece">
+              <div class="pomodoro-ring">
+                <svg width="240" height="240" viewBox="0 0 240 240">
+                  <circle class="ring-bg" cx="120" cy="120" r="106"></circle>
+                  <circle class="ring-fg" id="pomoRing" cx="120" cy="120" r="106" stroke="url(#gradPomo)"></circle>
+                  <defs>
+                    <linearGradient id="gradPomo" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="var(--dusty-pink)"/>
+                      <stop offset="100%" stop-color="var(--sage-green)"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="pomodoro-time">
+                  <div class="t" id="pomoTime">25:00</div>
+                  <div class="mode" id="pomoMode">Focus</div>
+                </div>
+              </div>
+            </div>
+            <div class="pomodoro-controls">
+              <button class="btn btn-primary" id="pomoStart">Start</button>
+              <button class="btn btn-ghost" id="pomoPause">Pause</button>
+              <button class="btn btn-ghost" id="pomoReset">Reset</button>
+            </div>
+            <div class="pomodoro-sessions-counter">
+              Focus Sessions Completed Today: <strong id="pomoSessionsCount">0</strong>
+            </div>
+            <div class="pomodoro-settings">
+              <label>Work (min)<input type="number" id="pomoWorkInput" value="25" min="0.05" step="0.05" max="120"></label>
+              <label>Short Break (min)<input type="number" id="pomoBreakInput" value="5" min="0.05" step="0.05" max="60"></label>
+              <label>Long Break (min)<input type="number" id="pomoLongInput" value="15" min="0.05" step="0.05" max="60"></label>
+            </div>
+            <div class="pomodoro-banner">Timestamps keep the timer accurate across tabs and page refreshes. Focus time is logged automatically to Analytics.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: GOALS -->
+      <section class="section" id="goals">
+        <div class="glass-card goals-board-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">🎯</span> Weekly Goals Board</div>
+          </div>
+          <form class="inline-form" id="goalsForm">
+            <input type="text" id="goalTitle" placeholder="Goal or Target (e.g. Solve 20 DSA questions)" required>
+            <input type="text" id="goalDesc" placeholder="Brief notes/context (optional)">
+            <button type="submit" class="btn btn-primary">＋ Add Goal</button>
+          </form>
+          <div class="goals-wrapper">
+            <div class="goals-progress-indicator">
+              Total Goals Completed: <span id="goalsProgressCounts">0/0</span> (<span id="goalsProgressPct">0%</span>)
+              <div class="goal-progress-bar-container">
+                <div class="goal-progress-bar-fill" id="goalsProgressBarFill"></div>
+              </div>
+            </div>
+            <div class="goals-list" id="goalsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: JOURNAL -->
+      <section class="section" id="journal">
+        <div class="glass-card journal-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">📝</span> Daily Reflection Journal</div>
+            <div class="journal-date-selector">
+              <label>Select Date: <input type="date" id="journalActiveDate"></label>
+            </div>
+          </div>
+          <div class="journal-wrapper">
+            <div class="journal-questions">
+              <div class="journal-question-box">
+                <label for="journalQ1">What did I accomplish today?</label>
+                <textarea id="journalQ1" rows="3" placeholder="Write accomplishments..."></textarea>
+              </div>
+              <div class="journal-question-box">
+                <label for="journalQ2">What distracted me today?</label>
+                <textarea id="journalQ2" rows="3" placeholder="Write distractions..."></textarea>
+              </div>
+              <div class="journal-question-box">
+                <label for="journalQ3">What did I learn today?</label>
+                <textarea id="journalQ3" rows="3" placeholder="Write key learning points..."></textarea>
+              </div>
+              <div class="journal-question-box">
+                <label for="journalQ4">What should I improve tomorrow?</label>
+                <textarea id="journalQ4" rows="3" placeholder="Write action items for tomorrow..."></textarea>
+              </div>
+              <button class="btn btn-primary" id="journalSaveBtn">Save Journal Entry</button>
+            </div>
+            <div class="journal-search-section">
+              <h4>Search Journal Entries</h4>
+              <input type="text" id="journalSearchInput" placeholder="Search keywords...">
+              <div class="journal-search-results" id="journalSearchResults"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: MOOD -->
+      <section class="section" id="mood">
+        <div class="glass-card mood-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">😊</span> Mood Tracker</div>
+          </div>
+          <div class="mood-tracker-wrapper">
+            <div class="mood-picker-box">
+              <h3>How are you feeling today?</h3>
+              <p class="text-muted">One mood entry per day.</p>
+              <div class="mood-picker" id="moodPicker">
+                <button class="mood-btn" data-mood="5" data-label="Excellent" type="button"><span class="emoji">😁</span><span class="label">Awesome!!!</span></button>
+                <button class="mood-btn" data-mood="4" data-label="Good" type="button"><span class="emoji">😄</span><span class="label">Great</span></button>
+                <button class="mood-btn" data-mood="3" data-label="Neutral" type="button"><span class="emoji">😐</span><span class="label">Ok..Ok...</span></button>
+                <button class="mood-btn" data-mood="2" data-label="Bad" type="button"><span class="emoji">🥲</span><span class="label">Gloomy</span></button>
+                <button class="mood-btn" data-mood="1" data-label="Very Bad" type="button"><span class="emoji">😫</span><span class="label">Everything went wrong...</span></button>
+              </div>
+            </div>
+            <div class="mood-analytics-summary">
+              <h3>Monthly Mood Statistics</h3>
+              <div class="mood-stats-row">
+                <div class="mood-stat-box">
+                  <span class="val" id="moodAverageLabel">N/A</span>
+                  <span class="lbl">Average Mood Score</span>
+                </div>
+                <div class="mood-stat-box">
+                  <span class="val" id="moodMostFreqLabel">N/A</span>
+                  <span class="lbl">Most Frequent Mood</span>
+                </div>
+              </div>
+              <div class="mood-frequency-chart-container">
+                <canvas id="moodFrequencyChart" height="150"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="mood-history-box mt-4">
+            <h3>Mood History</h3>
+            <div class="mood-history-list" id="moodHistoryList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: LEARNING -->
+      <section class="section" id="learning">
+        <div class="glass-card learning-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">📚</span> Learning Log & Study Tracker</div>
+          </div>
+          <form class="learning-form" id="learningForm">
+            <div class="form-row-main">
+              <input type="text" id="learnTopic" placeholder="Topic learned (e.g. Dijkstra's Algorithm)" required>
+            </div>
+            <div class="form-row-secondary">
+              <div class="form-group-inputs">
+                <label>Category:
+                  <select id="learnCategory">
+                    <option value="ServiceNow">ServiceNow</option>
+                    <option value="ADK">ADK</option>
+                    <option value="DSA">DSA</option>
+                    <option value="Data Analytics">Data Analytics</option>
+                    <option value="Full Stack">Full Stack</option>
+                    <option value="General">General / Other</option>
+                  </select>
+                </label>
+              </div>
+              <textarea id="learnNotes" placeholder="Summary notes, learnings..."></textarea>
+              <button type="submit" class="btn btn-primary">＋ Log Learning</button>
+            </div>
+          </form>
+          <div class="learning-history-wrapper">
+            <div class="learning-filter-row">
+              <h4>Chronological Learning History</h4>
+              <select id="learnFilterCategory">
+                <option value="All">All Categories</option>
+                <option value="ServiceNow">ServiceNow</option>
+                <option value="ADK">ADK</option>
+                <option value="DSA">DSA</option>
+                <option value="Data Analytics">Data Analytics</option>
+                <option value="Full Stack">Full Stack</option>
+                <option value="General">General / Other</option>
+              </select>
+            </div>
+            <div class="learning-list" id="learningList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: FUTURE NOTES -->
+      <section class="section" id="future">
+        <div class="glass-card future-notes-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">🔮</span> Future Me Notes</div>
+          </div>
+          <form class="future-form" id="futureForm">
+            <div class="form-row-inputs">
+              <label>Target Date: <input type="date" id="futureDate" required></label>
+            </div>
+            <textarea id="futureMessage" placeholder="Write a note to your future self..." required></textarea>
+            <button type="submit" class="btn btn-primary">＋ Save Future Note</button>
+          </form>
+          <div class="mt-4">
+            <h3 class="section-subheading">Scheduled Future Notes</h3>
+            <div class="future-notes-list" id="futureNotesList">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: ANALYTICS -->
+      <section class="section" id="analytics">
+        <div class="glass-card analytics-main-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">📊</span> Advanced Productivity Analytics</div>
+          </div>
+          <div class="analytics-tabs">
+            <div class="analytics-tab active" data-period="daily">Daily View</div>
+            <div class="analytics-tab" data-period="weekly">Weekly View</div>
+            <div class="analytics-tab" data-period="monthly">Monthly View</div>
+          </div>
+          <div class="analytics-grid-scores mb-4">
+            <div class="stat-card" style="background:var(--soft-mint);">
+              <div class="stat-value" id="analyticStatScore">N/A</div>
+              <div class="stat-label" id="analyticStatLabel">Productivity Score</div>
+            </div>
+            <div class="stat-card" style="background:var(--warm-peach);">
+              <div class="stat-value" id="analyticStatFocus">0h</div>
+              <div class="stat-label">Total Focus Duration</div>
+            </div>
+            <div class="stat-card" style="background:var(--dusty-pink);">
+              <div class="stat-value" id="analyticStatHabits">0%</div>
+              <div class="stat-label">Habit Success</div>
+            </div>
+          </div>
+          <div class="analytics-charts-grid">
+            <div class="chart-container-box">
+              <h4>Focus Time Trend</h4>
+              <canvas id="focusTimeChart"></canvas>
+            </div>
+            <div class="chart-container-box">
+              <h4>Task Completion Trend</h4>
+              <canvas id="taskCompletionChart"></canvas>
+            </div>
+          </div>
+          <div class="analytics-charts-grid mt-4">
+            <div class="chart-container-box">
+              <h4>Habit Completion Rates</h4>
+              <canvas id="habitCompletionChart"></canvas>
+            </div>
+            <div class="chart-container-box">
+              <h4>Mood vs Productivity Correlation</h4>
+              <canvas id="moodProdCorrelationChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION: AI PLANNER
+════════════════════════════════════════════════════════ -->
+<section class="section" id="ai-planner">
+  <div class="glass-card ai-planner-card">
+ 
+    <!-- Header -->
+    <div class="card-header">
+      <div class="card-title">
+        <span class="icon">🤖</span>
+        AI Planner
+      </div>
+      <span class="badge-ready">AI Powered</span>
+    </div>
+ 
+    <div class="ai-planner-wrapper">
+ 
+      <!-- Description -->
+      <p class="text-muted">
+        Describe your goals and available time. Flowspace builds a prioritised,
+        break-optimised schedule — harder tasks first, energy matched throughout.
+      </p>
+ 
+      <!-- Input -->
+      <div class="ai-input-area">
+        <textarea
+          id="aiPromptInput"
+          rows="3"
+          placeholder="e.g. I have 5 hours. High priority: GATE prep. Also need to practice LeetCode and revise Java."
+        ></textarea>
+ 
+        <!-- Example chips -->
+        <div class="example-chips" id="exampleChips">
+          <span class="chip">4 hrs, learn Japanese + LeetCode</span>
+          <span class="chip">Interview next week, revise Java, resume</span>
+          <span class="chip">6 hrs. High: ServiceNow CSA. Medium: DSA</span>
+          <span class="chip">Frontend project + gym today</span>
+        </div>
+ 
+        <div class="generate-row">
+          <button class="btn btn-primary" id="aiGenerateBtn">
+            ✨ Generate Plan
+          </button>
+          <div class="ai-thinking" id="aiThinking">
+            <div class="dots">
+              <span></span><span></span><span></span>
+            </div>
+            Planning your optimal day…
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Output -->
+      <div class="ai-output-box" id="aiOutputBox" style="display:none;">
+ 
+        <div class="output-header">
+          <h3>Suggested Schedule</h3>
+          <div class="plan-meta" id="planMeta"></div>
+        </div>
+ 
+        <!-- Summary stats -->
+        <div class="plan-summary" id="planSummary"></div>
+ 
+        <!-- Timeline -->
+        <div id="aiOutputSchedule" class="ai-schedule-rendering"></div>
+ 
+        <div class="ai-output-controls mt-3">
+          <button class="btn btn-primary btn-sm" id="aiApplyScheduleBtn">
+            Apply to Schedule
+          </button>
+          <button class="btn btn-ghost btn-sm" id="aiClearOutputBtn">
+            Clear
+          </button>
+        </div>
+ 
+      </div>
+    </div>
+  </div>
+</section>
+
+      <!-- SECTION: BACKUP -->
+      <section class="section" id="backup">
+        <div class="glass-card backup-management-card">
+          <div class="card-header">
+            <div class="card-title"><span class="icon">💾</span> Data Management, Export & Backup</div>
+          </div>
+          <div class="backup-grid">
+            <div class="backup-card">
+              <h3>Export Workspace Data</h3>
+              <p>Save all tasks, habits, journal logs, and history as a local backup.</p>
+              <div class="action-buttons">
+                <button class="btn btn-primary" id="exportJSONBtn">💾 Export JSON Backup</button>
+                <button class="btn btn-ghost" id="exportCSVBtn">📊 Export Tasks & Habits (CSV)</button>
+              </div>
+            </div>
+            <div class="backup-card">
+              <h3>Import Workspace Data</h3>
+              <p>Upload a previously exported JSON backup file. Warning: This will overwrite current data!</p>
+              <div class="import-actions">
+                <input type="file" id="importFileInput" accept=".json" style="display:none;">
+                <button class="btn btn-ghost" id="triggerImportBtn">📤 Choose Backup JSON File</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">✓</span>
+    <span id="toastMsg">Done</span>
+  </div>
+
+  <!-- Global Search Modal -->
+  <div class="modal-overlay" id="searchModalOverlay" style="display:none;">
+    <div class="search-modal">
+      <div class="search-modal-header">
+        <h3>🔍 Global System Search</h3>
+        <button class="search-close-btn" id="searchModalClose">×</button>
+      </div>
+      <input type="text" id="globalSearchInput" placeholder="Search tasks, journal, learning logs, goals, future notes..." autocomplete="off">
+      <div class="search-results-container" id="globalSearchResults">
+        <p class="text-muted text-center">Start typing to search across your system...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Future Note Popup -->
+  <div class="modal-overlay" id="futureNotePopupOverlay" style="display:none;">
+    <div class="future-popup-card">
+      <div class="popup-header">
+        <h3>🔮 Future Note Reminder!</h3>
+        <button class="popup-close-btn" id="futureNotePopupClose">×</button>
+      </div>
+      <div class="popup-body">
+        <p class="popup-date" id="futureNotePopupDate">Target Date: ...</p>
+        <p class="popup-message" id="futureNotePopupMessage">"..."</p>
+      </div>
+      <div class="popup-footer">
+        <button class="btn btn-primary btn-block" id="futureNotePopupDismissBtn">Acknowledged</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
